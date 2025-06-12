@@ -7,7 +7,7 @@ import { preprocessImage } from '@/lib/imageProcessig';
 
 export default function Camera() {
   const { videoRef, startCamera, stopCamera, captureImage, stream, error: cameraError, isPermissionGranted } = useCamera();
-  const { recognizeText, isProcessing, progress, result, error: ocrError, clearResult } = useOCR();
+  const { recognizeText, isProcessing, progress, result, error: ocrError, resetOCR } = useOCR();
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
 
@@ -22,7 +22,7 @@ export default function Camera() {
     const imageData = captureImage();
     if (imageData) {
       setCapturedImage(imageData);
-      clearResult();
+      resetOCR();
       
       // 이미지 전처리
       try {
@@ -47,7 +47,7 @@ export default function Camera() {
   const resetAll = () => {
     setCapturedImage(null);
     setProcessedImage(null);
-    clearResult();
+    resetOCR();
   };
 
   return (
