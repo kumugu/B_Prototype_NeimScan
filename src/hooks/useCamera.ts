@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 
 export const useCamera = () => {
@@ -35,8 +37,16 @@ export const useCamera = () => {
   }, []);
 
   const stopCamera = useCallback(() => {
-    stream?.getTracks().forEach(track => track.stop());
-    setStream(null);
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+      setIsPermissionGranted(false);
+      setError(null);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    }
   }, [stream]);
 
   const captureImage = useCallback((): string | null => {
@@ -65,6 +75,15 @@ export const useCamera = () => {
     
     return canvas.toDataURL('image/jpeg');
   }, [isPermissionGranted]);
+
+  // 컴포넌트 언마운트 시 카메라 정리
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
 
   return {
     videoRef,
